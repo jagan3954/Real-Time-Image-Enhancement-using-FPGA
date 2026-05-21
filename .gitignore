@@ -25,3 +25,12 @@
 # Python
 __pycache__/
 *.pyc
+
+# =========================
+# Exceptions (Files we WANT)
+# =========================
+
+# Allow the Bitstream folder and everything inside it
+!Bitstreamfiles/
+!Bitstreamfiles/*.bit
+!Bitstreamfiles/*.hwh
