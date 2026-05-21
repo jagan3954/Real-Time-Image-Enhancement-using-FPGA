@@ -1,26 +1,25 @@
-# Ignore everything
-*
+# Vivado junk
+*.cache
+*.gen
+*.runs
+*.sim
+*.hw
+*.ip_user_files
+*.jou
+*.log
+*.str
+*.tmp
+*.backup
+.Xil
 
-# Keep folders visible to Git
-!*/
+# Simulation
+*.wdb
+*.vcd
 
-# Ignore Vivado/simulation/generated folders
-project_6.sim/
-project_6.runs/
-project_6.cache/
-project_6.hw/
-project_6.ip_user_files/
-project_6.gen/
+# Bitstream
+*.bit
+*.bin
 
-# Allow only your source folder Verilog/SystemVerilog files
-!project_6.srcs/
-!project_6.srcs/sources_1/
-!project_6.srcs/sources_1/new/
-!project_6.srcs/sources_1/new/*.v
-!project_6.srcs/sources_1/new/*.sv
-!project_6.srcs/sources_1/new/*.vh
-!project_6.srcs/sources_1/new/*.svh
-
-# Allow basic repo files
-!.gitignore
-!README.md
+# Python
+__pycache__/
+*.pyc
