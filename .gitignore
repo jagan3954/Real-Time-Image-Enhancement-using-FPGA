@@ -13,6 +13,7 @@
 *.tmp
 *.backup
 .Xil
+*.sim/
 
 # Ignore simulation junk only
 *.wdb
