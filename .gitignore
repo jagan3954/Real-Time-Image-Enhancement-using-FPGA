@@ -1,8 +1,10 @@
-# Vivado junk
+# =========================
+# Vivado Generated Junk
+# =========================
+
 *.cache
 *.gen
 *.runs
-*.sim
 *.hw
 *.ip_user_files
 *.jou
@@ -12,11 +14,11 @@
 *.backup
 .Xil
 
-# Simulation
+# Ignore simulation junk only
 *.wdb
 *.vcd
 
-# Bitstream
+# Ignore bitstreams
 *.bit
 *.bin
 
