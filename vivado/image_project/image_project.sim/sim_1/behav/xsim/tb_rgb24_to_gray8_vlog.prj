@@ -1,0 +1,13 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "../../../../../../../../../tools/vivado/2025.2/data/rsb/busdef" \
+"../../../../../../rtl/preprocess.v" \
+"../../../../../../rtl/rgb24_to_gray8.v" \
+
+sv xil_defaultlib  --include "../../../../../../../../../tools/vivado/2025.2/data/rsb/busdef" \
+"../../../../../../tb/preprocess._tb.sv" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
