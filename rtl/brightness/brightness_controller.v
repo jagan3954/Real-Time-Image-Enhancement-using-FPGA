@@ -1,3 +1,5 @@
+`timescale 1ns/1ps
+
 module brightness_controller (
     input  wire        clk,
     input  wire        rst_n,
@@ -16,7 +18,9 @@ module brightness_controller (
     output reg  [8:0]  bright_y
 );
 
-reg [8:0] result;
+wire [8:0] add_result;
+
+assign add_result = {1'b0, gray_in} + {1'b0, bright_level};
 
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -24,20 +28,20 @@ always @(posedge clk or negedge rst_n) begin
         bright_valid <= 1'b0;
         bright_x     <= 10'd0;
         bright_y     <= 9'd0;
-        result       <= 9'd0;
-    end else begin
+    end
+    else begin
         bright_valid <= gray_valid;
         bright_x     <= gray_x;
         bright_y     <= gray_y;
 
         if (gray_valid) begin
             if (bright_dir == 1'b1) begin
-                result = {1'b0, gray_in} + {1'b0, bright_level};
-                if (result > 9'd255)
+                if (add_result > 9'd255)
                     bright_out <= 8'd255;
                 else
-                    bright_out <= result[7:0];
-            end else begin
+                    bright_out <= add_result[7:0];
+            end
+            else begin
                 if (bright_level >= gray_in)
                     bright_out <= 8'd0;
                 else

@@ -20,12 +20,19 @@ wire [7:0] g;
 wire [7:0] b;
 
 wire [15:0] gray_sum;
+wire [8:0]  gray_rounded;
+wire [7:0]  gray_value;
 
 assign r = rgb_pixel[23:16];
 assign g = rgb_pixel[15:8];
 assign b = rgb_pixel[7:0];
 
 assign gray_sum = (r * 8'd77) + (g * 8'd150) + (b * 8'd29);
+
+assign gray_rounded = {1'b0, gray_sum[15:8]} +
+                      ((gray_sum[7:0] >= 8'd128) ? 9'd1 : 9'd0);
+
+assign gray_value = (gray_rounded > 9'd255) ? 8'd255 : gray_rounded[7:0];
 
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -40,7 +47,7 @@ always @(posedge clk or negedge rst_n) begin
         gray_y     <= pixel_y;
 
         if (pixel_valid)
-            gray_out <= gray_sum[15:8];
+            gray_out <= gray_value;
     end
 end
 
