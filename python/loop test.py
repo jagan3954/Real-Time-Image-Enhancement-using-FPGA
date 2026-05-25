@@ -1,4 +1,4 @@
- from pynq import Overlay, MMIO, allocate
+from pynq import Overlay, MMIO, allocate
 
 import numpy as np
 

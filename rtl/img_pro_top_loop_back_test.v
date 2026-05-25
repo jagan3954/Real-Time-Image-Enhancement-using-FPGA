@@ -1,7 +1,6 @@
 module img_pro_top_loop_back_test(
     input wire clk,
     input wire rst_n,
-
     // AXI-Lite ports stay exactly the same
     input  wire [31:0] s_axi_awaddr,
     input  wire        s_axi_awvalid,
@@ -37,6 +36,13 @@ module img_pro_top_loop_back_test(
 
     wire [7:0] brightness_ctrl;
     wire [7:0] contrast_ctrl;
+    //for gray to brightness
+    // --- Internal Wires for the Pipeline ---
+    wire [31:0] gray_tdata;
+    wire        gray_tvalid;
+    wire        gray_tready;
+    wire        gray_tuser;
+    wire        gray_tlast;
 
     axi_lite_slave ctrl_unit (
         .S_AXI_ACLK    (clk),
@@ -61,12 +67,65 @@ module img_pro_top_loop_back_test(
         .brightness_val(brightness_ctrl),
         .contrast_val  (contrast_ctrl)
     );
+// --- COMMENT OUT THE LOOPBACK ---
+    // assign m_axis_tdata  = s_axis_tdata;
+    // assign m_axis_tvalid = s_axis_tvalid;
+    // assign m_axis_tlast  = s_axis_tlast;
+    // assign m_axis_tuser  = s_axis_tuser;   
+    // assign s_axis_tready = m_axis_tready; 
 
-    // Loopback including tuser
-    assign m_axis_tdata  = s_axis_tdata;
-    assign m_axis_tvalid = s_axis_tvalid;
-    assign m_axis_tlast  = s_axis_tlast;
-    assign m_axis_tuser  = s_axis_tuser;   // ADD THIS
-    assign s_axis_tready = 1'b1;
+//    // --- UNCOMMENT THE GRAYSCALE MODULE ---
+//    rgba_to_gray u_grayscale_unit (
+//        .s_axis_tdata  (s_axis_tdata),
+//        .s_axis_tvalid (s_axis_tvalid),
+//        .s_axis_tready (s_axis_tready),
+//        .s_axis_tuser  (s_axis_tuser),
+//        .s_axis_tlast  (s_axis_tlast),
+        
+//        .m_axis_tdata  (m_axis_tdata),
+//        .m_axis_tvalid (m_axis_tvalid),
+//        .m_axis_tready (m_axis_tready),
+//        .m_axis_tuser  (m_axis_tuser),
+//        .m_axis_tlast  (m_axis_tlast)
+//    );
+
+// --- STEP 1: Grayscale Conversion ---
+    // This takes the RAW image from the VDMA (s_axis)
+    rgba_to_gray u_grayscale_unit (
+        .s_axis_tdata  (s_axis_tdata),
+        .s_axis_tvalid (s_axis_tvalid),
+        .s_axis_tready (s_axis_tready), // Connects to the top-level input
+        .s_axis_tuser  (s_axis_tuser),
+        .s_axis_tlast  (s_axis_tlast),
+        
+        // Output goes to internal "gray" wires, NOT the top-level output
+        .m_axis_tdata  (gray_tdata),
+        .m_axis_tvalid (gray_tvalid),
+        .m_axis_tready (gray_tready),
+        .m_axis_tuser  (gray_tuser),
+        .m_axis_tlast  (gray_tlast)
+    );
+
+    // --- STEP 2: Brightness Control ---
+    // This takes the gray image and adds the offset
+    brightness_ctrl u_brightness_unit (
+        .brightness_offset (brightness_ctrl), // This comes from your AXI Lite Slave!
+        
+        // Input comes from the Grayscale output
+        .s_axis_tdata  (gray_tdata),
+        .s_axis_tvalid (gray_tvalid),
+        .s_axis_tready (gray_tready),
+        .s_axis_tuser  (gray_tuser),
+        .s_axis_tlast  (gray_tlast),
+        
+        // Final output goes to the actual top-level pins (m_axis)
+        .m_axis_tdata  (m_axis_tdata),
+        .m_axis_tvalid (m_axis_tvalid),
+        .m_axis_tready (m_axis_tready),
+        .m_axis_tuser  (m_axis_tuser),
+        .m_axis_tlast  (m_axis_tlast)
+    );
+
+
 
 endmodule
