@@ -2,7 +2,7 @@ module img_pro_top_loop_back_test(
     input wire clk,
     input wire rst_n,
 
-    // AXI-Lite ports stay exactly the same
+    
     input  wire [31:0] s_axi_awaddr,
     input  wire        s_axi_awvalid,
     output wire        s_axi_awready,
@@ -21,17 +21,17 @@ module img_pro_top_loop_back_test(
     output wire        s_axi_rvalid,
     input  wire        s_axi_rready,
 
-    // AXI-Stream with tuser added
+   
     input  wire [31:0] s_axis_tdata,
     input  wire        s_axis_tvalid,
     input  wire        s_axis_tlast,
-    input  wire        s_axis_tuser,   // ADD THIS
+    input  wire        s_axis_tuser,   
     output wire        s_axis_tready,
 
     output wire [31:0] m_axis_tdata,
     output wire        m_axis_tvalid,
     output wire        m_axis_tlast,
-    output wire        m_axis_tuser,   // ADD THIS
+    output wire        m_axis_tuser,   
     input  wire        m_axis_tready
 );
 
@@ -62,11 +62,11 @@ module img_pro_top_loop_back_test(
         .contrast_val  (contrast_ctrl)
     );
 
-    // Loopback including tuser
+    
     assign m_axis_tdata  = s_axis_tdata;
     assign m_axis_tvalid = s_axis_tvalid;
     assign m_axis_tlast  = s_axis_tlast;
-    assign m_axis_tuser  = s_axis_tuser;   // ADD THIS
+    assign m_axis_tuser  = s_axis_tuser;   
     assign s_axis_tready = 1'b1;
 
 endmodule
