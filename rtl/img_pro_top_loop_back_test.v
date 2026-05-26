@@ -54,6 +54,14 @@ wire        bright_tready;
 wire        bright_tuser;
 wire        bright_tlast;
 ///////////
+///3x3 filter wires
+wire [31:0] contrast_tdata;
+wire        contrast_tvalid;
+wire        contrast_tready;
+wire        contrast_tuser;
+wire        contrast_tlast;
+///////////////
+
     axi_lite_slave ctrl_unit (
         .S_AXI_ACLK    (clk),
         .S_AXI_ARESETN (rst_n),
@@ -138,7 +146,31 @@ wire        bright_tlast;
     .s_axis_tuser  (bright_tuser),
     .s_axis_tlast  (bright_tlast),
     
-    // Output to Final Top-Level Pins
+//    // Output to Final Top-Level Pins
+//    .m_axis_tdata  (m_axis_tdata),
+//    .m_axis_tvalid (m_axis_tvalid),
+//    .m_axis_tready (m_axis_tready),
+//    .m_axis_tuser  (m_axis_tuser),
+//    .m_axis_tlast  (m_axis_tlast)
+
+// TO THIS (Connected to your new intermediate wires)
+.m_axis_tdata  (contrast_tdata),
+.m_axis_tvalid (contrast_tvalid),
+.m_axis_tready (contrast_tready),
+.m_axis_tuser  (contrast_tuser),
+.m_axis_tlast  (contrast_tlast)
+);
+
+
+noise_filter u_noise_unit (
+    .clk           (clk),
+    .rst_n         (rst_n),
+    .s_axis_tdata  (contrast_tdata),
+    .s_axis_tvalid (contrast_tvalid),
+    .s_axis_tready (contrast_tready),
+    .s_axis_tuser  (contrast_tuser),
+    .s_axis_tlast  (contrast_tlast),
+
     .m_axis_tdata  (m_axis_tdata),
     .m_axis_tvalid (m_axis_tvalid),
     .m_axis_tready (m_axis_tready),
