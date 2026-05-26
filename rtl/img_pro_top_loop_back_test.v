@@ -33,34 +33,32 @@ module img_pro_top_loop_back_test(
     output wire        m_axis_tuser,   
     input  wire        m_axis_tready
 );
+// =========================================================
+    // 1. Control Wires (From AXI-Lite Slave)
+    // =========================================================
+    wire [7:0]  brightness_ctrl;
+    wire [7:0]  min_val_ctrl;
+    wire [15:0] scale_factor_ctrl;
 
-    wire [7:0] brightness_ctrl;
-   // wire [7:0] contrast_ctrl;
+    // =========================================================
+    // 2. Pipeline "Glue" Wires (The data highway)
+    // =========================================================
     
+    // Grayscale -> Noise Filter
     wire [31:0] gray_tdata;
-    wire        gray_tvalid;
-    wire        gray_tready;
-    wire        gray_tuser;
-    wire        gray_tlast;
- ////////   
-    // 1. New Control Wires
-wire [7:0]  min_val_ctrl;
-wire [15:0] scale_factor_ctrl;
+    wire        gray_tvalid, gray_tready, gray_tuser, gray_tlast;
 
-// 2. New Pipeline Wires (Between Brightness and Contrast)
-wire [31:0] bright_tdata;
-wire        bright_tvalid;
-wire        bright_tready;
-wire        bright_tuser;
-wire        bright_tlast;
-///////////
-///3x3 filter wires
-wire [31:0] contrast_tdata;
-wire        contrast_tvalid;
-wire        contrast_tready;
-wire        contrast_tuser;
-wire        contrast_tlast;
-///////////////
+    // Noise Filter -> Brightness (YOU NEED TO ADD THIS SET)
+    wire [31:0] noise_tdata;
+    wire        noise_tvalid, noise_tready, noise_tuser, noise_tlast;
+
+    // Brightness -> Contrast
+    wire [31:0] bright_tdata;
+    wire        bright_tvalid, bright_tready, bright_tuser, bright_tlast;
+
+    // Contrast -> Sobel Edge Detection
+    wire [31:0] contrast_tdata;
+    wire        contrast_tvalid, contrast_tready, contrast_tuser, contrast_tlast;
 
     axi_lite_slave ctrl_unit (
         .S_AXI_ACLK    (clk),
@@ -89,7 +87,7 @@ wire        contrast_tlast;
         .min_val      (min_val_ctrl),
         .scale_factor (scale_factor_ctrl)
     );
-
+//111111
     rgba_to_gray u_grayscale_unit (
         .s_axis_tdata  (s_axis_tdata),
         .s_axis_tvalid (s_axis_tvalid),
@@ -97,33 +95,37 @@ wire        contrast_tlast;
         .s_axis_tuser  (s_axis_tuser),
         .s_axis_tlast  (s_axis_tlast),
         
-        
         .m_axis_tdata  (gray_tdata),
         .m_axis_tvalid (gray_tvalid),
         .m_axis_tready (gray_tready),
         .m_axis_tuser  (gray_tuser),
         .m_axis_tlast  (gray_tlast)
     );
-
-    
-    brightness_ctrl u_brightness_unit (
-        .brightness_offset (brightness_ctrl), 
-        
-       
+    // 2. Noise Filter (Input from gray_* -> Output to noise_*)
+    noise_filter #( .IMG_WIDTH(640) ) u_noise_unit (
+        .clk(clk), .rst_n(rst_n),
         .s_axis_tdata  (gray_tdata),
         .s_axis_tvalid (gray_tvalid),
         .s_axis_tready (gray_tready),
         .s_axis_tuser  (gray_tuser),
         .s_axis_tlast  (gray_tlast),
+        .m_axis_tdata  (noise_tdata),
+        .m_axis_tvalid (noise_tvalid),
+        .m_axis_tready (noise_tready),
+        .m_axis_tuser  (noise_tuser),
+        .m_axis_tlast  (noise_tlast)
+    );
+    
+    brightness_ctrl u_brightness_unit (
+        .brightness_offset (brightness_ctrl), 
+        
+       .s_axis_tdata  (noise_tdata),
+        .s_axis_tvalid (noise_tvalid),
+        .s_axis_tready (noise_tready),
+        .s_axis_tuser  (noise_tuser),
+        .s_axis_tlast  (noise_tlast),
         
         
-//        .m_axis_tdata  (m_axis_tdata),
-//        .m_axis_tvalid (m_axis_tvalid),
-//        .m_axis_tready (m_axis_tready),
-//        .m_axis_tuser  (m_axis_tuser),
-//        .m_axis_tlast  (m_axis_tlast)
-        // Inside brightness_ctrl u_brightness_unit (...)
-// Change the m_axis_* mappings to:
 .m_axis_tdata  (bright_tdata),
 .m_axis_tvalid (bright_tvalid),
 .m_axis_tready (bright_tready),
@@ -162,21 +164,22 @@ wire        contrast_tlast;
 );
 
 
-noise_filter u_noise_unit (
-    .clk           (clk),
-    .rst_n         (rst_n),
-    .s_axis_tdata  (contrast_tdata),
-    .s_axis_tvalid (contrast_tvalid),
-    .s_axis_tready (contrast_tready),
-    .s_axis_tuser  (contrast_tuser),
-    .s_axis_tlast  (contrast_tlast),
-
-    .m_axis_tdata  (m_axis_tdata),
-    .m_axis_tvalid (m_axis_tvalid),
-    .m_axis_tready (m_axis_tready),
-    .m_axis_tuser  (m_axis_tuser),
-    .m_axis_tlast  (m_axis_tlast)
-);
+///////5555555555
+sobel_edge #( .IMG_WIDTH(640) ) u_sobel_unit (
+        .clk(clk), .rst_n(rst_n),
+        .s_axis_tdata  (contrast_tdata),
+        .s_axis_tvalid (contrast_tvalid),
+        .s_axis_tready (contrast_tready),
+        .s_axis_tuser  (contrast_tuser),
+        .s_axis_tlast  (contrast_tlast),
+        
+        // Final exit out to the board pins!
+        .m_axis_tdata  (m_axis_tdata),
+        .m_axis_tvalid (m_axis_tvalid),
+        .m_axis_tready (m_axis_tready),
+        .m_axis_tuser  (m_axis_tuser),
+        .m_axis_tlast  (m_axis_tlast)
+    );
 
 
 endmodule
