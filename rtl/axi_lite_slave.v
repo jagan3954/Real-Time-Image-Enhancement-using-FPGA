@@ -11,8 +11,11 @@
 	(
 		
         output wire [7:0] brightness_val,
-        output wire [7:0] contrast_val,
-		
+    //    output wire [7:0] contrast_val,
+		// Remove: output wire [7:0] contrast_val,
+// Add these instead:
+output wire [7:0]  min_val,
+output wire [15:0] scale_factor,
 
 		
 		input wire  S_AXI_ACLK,
@@ -298,6 +301,7 @@
 	  assign S_AXI_RDATA = (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h0) ? slv_reg0 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h1) ? slv_reg1 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h2) ? slv_reg2 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h3) ? slv_reg3 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h4) ? slv_reg4 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h5) ? slv_reg5 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h6) ? slv_reg6 : (axi_araddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] == 3'h7) ? slv_reg7 : 0; 
 	
     assign brightness_val = slv_reg0[7:0];  
-    assign contrast_val   = slv_reg1[7:0];  
-	
+//    assign contrast_val   = slv_reg1[7:0];  
+	assign min_val      = slv_reg1[7:0];   // 8-bit value from Register 1
+    assign scale_factor = slv_reg2[15:0];  // 16-bit value from Register 2
 	endmodule

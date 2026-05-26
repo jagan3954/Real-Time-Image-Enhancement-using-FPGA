@@ -35,14 +35,25 @@ module img_pro_top_loop_back_test(
 );
 
     wire [7:0] brightness_ctrl;
-    wire [7:0] contrast_ctrl;
+   // wire [7:0] contrast_ctrl;
     
     wire [31:0] gray_tdata;
     wire        gray_tvalid;
     wire        gray_tready;
     wire        gray_tuser;
     wire        gray_tlast;
+ ////////   
+    // 1. New Control Wires
+wire [7:0]  min_val_ctrl;
+wire [15:0] scale_factor_ctrl;
 
+// 2. New Pipeline Wires (Between Brightness and Contrast)
+wire [31:0] bright_tdata;
+wire        bright_tvalid;
+wire        bright_tready;
+wire        bright_tuser;
+wire        bright_tlast;
+///////////
     axi_lite_slave ctrl_unit (
         .S_AXI_ACLK    (clk),
         .S_AXI_ARESETN (rst_n),
@@ -64,7 +75,11 @@ module img_pro_top_loop_back_test(
         .S_AXI_RVALID  (s_axi_rvalid),
         .S_AXI_RREADY  (s_axi_rready),
         .brightness_val(brightness_ctrl),
-        .contrast_val  (contrast_ctrl)
+        //.contrast_val  (contrast_ctrl)
+        // Inside axi_lite_slave ctrl_unit (...)
+// Replace .contrast_val(...) with:
+        .min_val      (min_val_ctrl),
+        .scale_factor (scale_factor_ctrl)
     );
 
     rgba_to_gray u_grayscale_unit (
@@ -94,13 +109,42 @@ module img_pro_top_loop_back_test(
         .s_axis_tlast  (gray_tlast),
         
         
-        .m_axis_tdata  (m_axis_tdata),
-        .m_axis_tvalid (m_axis_tvalid),
-        .m_axis_tready (m_axis_tready),
-        .m_axis_tuser  (m_axis_tuser),
-        .m_axis_tlast  (m_axis_tlast)
+//        .m_axis_tdata  (m_axis_tdata),
+//        .m_axis_tvalid (m_axis_tvalid),
+//        .m_axis_tready (m_axis_tready),
+//        .m_axis_tuser  (m_axis_tuser),
+//        .m_axis_tlast  (m_axis_tlast)
+        // Inside brightness_ctrl u_brightness_unit (...)
+// Change the m_axis_* mappings to:
+.m_axis_tdata  (bright_tdata),
+.m_axis_tvalid (bright_tvalid),
+.m_axis_tready (bright_tready),
+.m_axis_tuser  (bright_tuser),
+.m_axis_tlast  (bright_tlast)
     );
-
+    
+    
+    kontrast u_contrast_unit (
+    .clk           (clk),   // Connect to top-level clk
+    .rst_n         (rst_n), // Connect to top-level rst_n
+    .min_val       (min_val_ctrl),
+    .scale_factor  (scale_factor_ctrl),
+ 
+    
+    // Input from Brightness module
+    .s_axis_tdata  (bright_tdata),
+    .s_axis_tvalid (bright_tvalid),
+    .s_axis_tready (bright_tready),
+    .s_axis_tuser  (bright_tuser),
+    .s_axis_tlast  (bright_tlast),
+    
+    // Output to Final Top-Level Pins
+    .m_axis_tdata  (m_axis_tdata),
+    .m_axis_tvalid (m_axis_tvalid),
+    .m_axis_tready (m_axis_tready),
+    .m_axis_tuser  (m_axis_tuser),
+    .m_axis_tlast  (m_axis_tlast)
+);
 
 
 endmodule
