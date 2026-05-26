@@ -1,0 +1,109 @@
+from pynq import Overlay, MMIO, allocate
+import numpy as np
+import cv2
+import time
+import matplotlib.pyplot as plt
+
+class ImageProcessor:
+    def __init__(self, bitstream_path):
+        # 1. Load Hardware
+        self.overlay = Overlay(bitstream_path)
+        
+        # 2. Setup IP Addresses
+        self.ctrl_name = 'img_pro_top_loop_bac_0'
+        self.ctrl = MMIO(self.overlay.ip_dict[self.ctrl_name]['phys_addr'], 0x100)
+        self.vdma = MMIO(self.overlay.ip_dict['axi_vdma_0']['phys_addr'], 0x10000)
+        
+        # 3. Pre-allocate buffers (Permanent memory to prevent CMA crashes)
+        self.width, self.height = 640, 480
+        self.stride = self.width * 4
+        self.in_buf = allocate(shape=(self.height, self.width, 4), dtype=np.uint8)
+        self.out_buf = allocate(shape=(self.height, self.width, 4), dtype=np.uint8)
+        print("Hardware and Memory Initialized Successfully.")
+
+    def process(self, image_path, brightness, min_val, max_val):
+        # --- 1. CALCULATE AND SEND HARDWARE CONTROL SIGNALS ---
+        # Brightness (Register 0)
+        self.ctrl.write(0x00, int(brightness))
+        
+        # Contrast Math (Prevent division by zero)
+        diff = (max_val - min_val) if (max_val > min_val) else 1
+        scale_factor = int((255 / diff) * 256) # Q8.8 format
+        
+        # Write Contrast Min (Register 1) and Scale Factor (Register 2)
+        self.ctrl.write(0x04, int(min_val))
+        self.ctrl.write(0x08, int(scale_factor))
+        
+        # --- 2. PREPARE IMAGE ---
+        img = cv2.imread(image_path)
+        img = cv2.resize(img, (self.width, self.height))
+        self.in_buf[:] = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+        self.in_buf.flush()
+        
+        # --- 3. VDMA HARD RESET ---
+        self.vdma.write(0x00, 0x4) 
+        self.vdma.write(0x30, 0x4) 
+        time.sleep(0.02)
+        
+        # --- 4. START VDMA TRANSFER ---
+        self.vdma.write(0x00, 0x01)
+        self.vdma.write(0x30, 0x01)
+        self.vdma.write(0x5C, self.in_buf.physical_address)
+        self.vdma.write(0xAC, self.out_buf.physical_address)
+        self.vdma.write(0x54, self.stride)
+        self.vdma.write(0x58, self.stride)
+        self.vdma.write(0xA4, self.stride)
+        self.vdma.write(0xA8, self.stride)
+        
+        # Go!
+        self.vdma.write(0xA0, self.height)
+        self.vdma.write(0x50, self.height)
+        
+        # Wait for completion
+        start_time = time.time()
+        while not (self.vdma.read(0x34) & 0x1000):
+            if time.time() - start_time > 2.0:
+                print("VDMA Timeout! Resetting Hardware...")
+                return None
+            time.sleep(0.01)
+            
+        self.out_buf.invalidate()
+        return cv2.cvtColor(self.out_buf, cv2.COLOR_RGBA2RGB)
+
+
+# ==========================================
+# RUN THE HARDWARE
+# ==========================================
+
+# 1. Initialize (Run this once)
+proc = ImageProcessor("Bitstreamfiles/grbrko3x3.bit")  
+
+# 2. Set Parameters to NEUTRAL to test the raw Noise Filter
+BRIGHTNESS_OFFSET = 0
+CONTRAST_MIN = 0    
+CONTRAST_MAX = 255  
+
+# 3. Process the Image (using .jpeg extension)
+result_img = proc.process("test2.jpeg", brightness=BRIGHTNESS_OFFSET, min_val=CONTRAST_MIN, max_val=CONTRAST_MAX)
+
+# 4. Show the Output Side-by-Side
+if result_img is not None:
+    # Load and format the original image for comparison (using .jpeg extension)
+    orig_img = cv2.imread("test2.jpeg")
+    orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGR2RGB)
+    
+    # Create a 1x2 grid for the images
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    
+    # Left: Original Image
+    axes[0].imshow(orig_img)
+    axes[0].set_title("Original Input")
+    axes[0].axis('off')
+    
+    # Right: Hardware Output
+    axes[1].imshow(result_img)
+    axes[1].set_title(f"HW Output | Bright: +{BRIGHTNESS_OFFSET} | Cont: [{CONTRAST_MIN}, {CONTRAST_MAX}]")
+    axes[1].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
