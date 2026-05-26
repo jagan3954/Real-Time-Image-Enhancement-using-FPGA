@@ -117,6 +117,10 @@ module img_pro_top_loop_back_test(
     );
     
     brightness_ctrl u_brightness_unit (
+    .clk           (clk),    // <--- ARE THESE HERE?
+        .rst_n         (rst_n),  // <--- AND THIS?
+      //  .brightness    (brightness_ctrl),
+        // ... rest of the wires
         .brightness_offset (brightness_ctrl), 
         
        .s_axis_tdata  (noise_tdata),

@@ -1,0 +1,109 @@
+from pynq import Overlay, MMIO, allocate
+import numpy as np
+import cv2
+import time
+import matplotlib.pyplot as plt
+
+class HardwareVisionPipeline:
+    def __init__(self, bitstream_path):
+        # 1. Load the perfectly-timed Hardware!
+        print("Loading Bitstream...")
+        self.overlay = Overlay(bitstream_path)
+        
+        # 2. Setup AXI Connections
+        self.ctrl = MMIO(self.overlay.ip_dict['img_pro_top_loop_bac_0']['phys_addr'], 0x100)
+        self.vdma = MMIO(self.overlay.ip_dict['axi_vdma_0']['phys_addr'], 0x10000)
+        
+        # 3. Memory Allocation
+        self.width, self.height = 640, 480
+        self.stride = self.width * 4
+        self.in_buf = allocate(shape=(self.height, self.width, 4), dtype=np.uint8)
+        self.out_buf = allocate(shape=(self.height, self.width, 4), dtype=np.uint8)
+        print("Hardware ready for full pipeline execution!")
+
+    def set_parameters(self, brightness, min_val, max_val):
+        # Calculate scale factor for the contrast module
+        diff = (max_val - min_val) if (max_val > min_val) else 1
+        scale_factor = int((255 / diff) * 256) 
+        
+        # Send to FPGA
+        self.ctrl.write(0x00, int(brightness))
+        self.ctrl.write(0x04, int(min_val))
+        self.ctrl.write(0x08, int(scale_factor))
+        print(f"HW Updated -> Brightness: {brightness}, Min: {min_val}, Max: {max_val}")
+
+    def process_image(self, image_path):
+        # --- 1. PREPARE INPUT ---
+        img = cv2.imread(image_path)
+        if img is None:
+            print("Error: Image not found!")
+            return None
+            
+        img = cv2.resize(img, (self.width, self.height))
+        self.in_buf[:] = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+        self.in_buf.flush()
+        
+        # --- 2. START THE FPGA PIPELINE ---
+        # Reset VDMA
+        self.vdma.write(0x00, 0x4) 
+        self.vdma.write(0x30, 0x4) 
+        time.sleep(0.02)
+        
+        # Start VDMA
+        self.vdma.write(0x00, 0x01)
+        self.vdma.write(0x30, 0x01)
+        self.vdma.write(0x5C, self.in_buf.physical_address)
+        self.vdma.write(0xAC, self.out_buf.physical_address)
+        self.vdma.write(0x54, self.stride)
+        self.vdma.write(0x58, self.stride)
+        self.vdma.write(0xA4, self.stride)
+        self.vdma.write(0xA8, self.stride)
+        
+        # Trigger the transfer
+        self.vdma.write(0xA0, self.height)
+        self.vdma.write(0x50, self.height)
+        
+        # --- 3. WAIT FOR COMPLETION ---
+        # The FPGA is now running Grayscale -> Noise -> Brightness -> Contrast -> Sobel
+        start_time = time.time()
+        while not (self.vdma.read(0x34) & 0x1000):
+            if time.time() - start_time > 2.0:
+                print("VDMA Timeout!")
+                return None
+            
+        self.out_buf.invalidate()
+        print("Pipeline execution complete!")
+        return cv2.cvtColor(self.out_buf, cv2.COLOR_RGBA2RGB)
+
+# ==========================================
+# EXECUTE THE SCRIPT
+# ==========================================
+
+# 1. Initialize
+# (Make sure this points to your NEW perfectly-timed bitstream!)
+pipeline = HardwareVisionPipeline("Bitstreamfiles/fixed_slack.bit")  
+
+# 2. Set Parameters to help Sobel pop
+pipeline.set_parameters(brightness=0, min_val=40, max_val=200)
+
+# 3. Run the Image
+# (Try this on your noisy cat image!)
+result_img = pipeline.process_image("test2.jpeg")
+
+# 4. Display the results
+if result_img is not None:
+    orig_img = cv2.imread("test2.jpeg")
+    orig_img = cv2.cvtColor(orig_img, cv2.COLOR_BGR2RGB)
+    
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    
+    axes[0].imshow(orig_img)
+    axes[0].set_title("1. Original Input")
+    axes[0].axis('off')
+    
+    axes[1].imshow(result_img)
+    axes[1].set_title("5. Final Output (HW Sobel Edges)")
+    axes[1].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
