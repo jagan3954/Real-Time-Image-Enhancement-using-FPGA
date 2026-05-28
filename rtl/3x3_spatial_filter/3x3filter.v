@@ -41,7 +41,8 @@ module noise_filter #(
     reg [3:0] valid_shift;
     reg [3:0] last_shift;
     reg [3:0] user_shift;
-
+////////
+reg [23:0] color_delay [0:3]; // Delay for Alpha, Cr, Cb
     wire [7:0] pixel_in = s_axis_tdata[7:0];
 
     always @(posedge clk) begin
@@ -101,11 +102,17 @@ module noise_filter #(
             valid_shift <= {valid_shift[2:0], s_axis_tvalid};
             last_shift  <= {last_shift[2:0],  s_axis_tlast};
             user_shift  <= {user_shift[2:0],  s_axis_tuser};
+            color_delay[0] <= s_axis_tdata[31:8];
+            color_delay[1] <= color_delay[0];
+            color_delay[2] <= color_delay[1];
+            color_delay[3] <= color_delay[2];
         end
     end
 
     // Assign final outputs
-    assign m_axis_tdata  = {8'hFF, final_pixel, final_pixel, final_pixel};
+   // assign m_axis_tdata  = {8'hFF, final_pixel, final_pixel, final_pixel};
+    // OLD: {8'hFF, final_pixel, final_pixel, final_pixel}
+assign m_axis_tdata = {color_delay[3], final_pixel};
     assign m_axis_tvalid = valid_shift[3];
     assign m_axis_tlast  = last_shift[3];
     assign m_axis_tuser  = user_shift[3];

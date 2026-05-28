@@ -59,6 +59,10 @@ module img_pro_top_loop_back_test(
     // Contrast -> Sobel Edge Detection
     wire [31:0] contrast_tdata;
     wire        contrast_tvalid, contrast_tready, contrast_tuser, contrast_tlast;
+    
+    ///out 
+    wire [31:0] sobel_out_tdata;
+    wire        sobel_out_tvalid, sobel_out_tready, sobel_out_tuser, sobel_out_tlast;
 
     axi_lite_slave ctrl_unit (
         .S_AXI_ACLK    (clk),
@@ -88,14 +92,30 @@ module img_pro_top_loop_back_test(
         .scale_factor (scale_factor_ctrl)
     );
 //111111
-    rgba_to_gray u_grayscale_unit (
+//    rgba_to_gray u_grayscale_unit (
+//        .s_axis_tdata  (s_axis_tdata),
+//        .s_axis_tvalid (s_axis_tvalid),
+//        .s_axis_tready (s_axis_tready), 
+//        .s_axis_tuser  (s_axis_tuser),
+//        .s_axis_tlast  (s_axis_tlast),
+        
+//        .m_axis_tdata  (gray_tdata),
+//        .m_axis_tvalid (gray_tvalid),
+//        .m_axis_tready (gray_tready),
+//        .m_axis_tuser  (gray_tuser),
+//        .m_axis_tlast  (gray_tlast)
+//    );
+//////////////////////////////1
+rgba_to_ycbcr u_ycbcr_entrance (
+        .clk           (clk),
+        .rst_n         (rst_n),
         .s_axis_tdata  (s_axis_tdata),
         .s_axis_tvalid (s_axis_tvalid),
-        .s_axis_tready (s_axis_tready), 
+        .s_axis_tready (s_axis_tready),
         .s_axis_tuser  (s_axis_tuser),
         .s_axis_tlast  (s_axis_tlast),
         
-        .m_axis_tdata  (gray_tdata),
+        .m_axis_tdata  (gray_tdata), // We keep this wire name to avoid renaming everything
         .m_axis_tvalid (gray_tvalid),
         .m_axis_tready (gray_tready),
         .m_axis_tuser  (gray_tuser),
@@ -178,12 +198,33 @@ sobel_edge #( .IMG_WIDTH(640) ) u_sobel_unit (
         .s_axis_tlast  (contrast_tlast),
         
         // Final exit out to the board pins!
-        .m_axis_tdata  (m_axis_tdata),
+//        .m_axis_tdata  (m_axis_tdata),
+//        .m_axis_tvalid (m_axis_tvalid),
+//        .m_axis_tready (m_axis_tready),
+//        .m_axis_tuser  (m_axis_tuser),
+//        .m_axis_tlast  (m_axis_tlast)
+// Inside u_sobel_unit
+    .m_axis_tdata  (sobel_out_tdata),
+    .m_axis_tvalid (sobel_out_tvalid),
+    .m_axis_tready (sobel_out_tready),
+    .m_axis_tuser  (sobel_out_tuser),
+    .m_axis_tlast  (sobel_out_tlast)
+    );
+    //////////////////////
+ycbcr_to_rgba u_rgba_exit (
+        .clk           (clk),
+        .rst_n         (rst_n),
+        .s_axis_tdata  (sobel_out_tdata),
+        .s_axis_tvalid (sobel_out_tvalid),
+        .s_axis_tready (sobel_out_tready),
+        .s_axis_tuser  (sobel_out_tuser),
+        .s_axis_tlast  (sobel_out_tlast),
+        
+        .m_axis_tdata  (m_axis_tdata),   // Final exit to board pins!
         .m_axis_tvalid (m_axis_tvalid),
         .m_axis_tready (m_axis_tready),
         .m_axis_tuser  (m_axis_tuser),
         .m_axis_tlast  (m_axis_tlast)
     );
-
 
 endmodule

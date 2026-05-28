@@ -90,7 +90,10 @@ module brightness_ctrl (
             m_tlast_reg  <= 1'b0;
         end else if (m_axis_tready) begin
             // We capture the math result into a register on every clock edge
-            m_tdata_reg  <= {a, b_out, g_out, r_out};
+           // m_tdata_reg  <= {a, b_out, g_out, r_out};
+            // OLD: {a, b_out, g_out, r_out}
+// NEW: Keep the upper 24 bits from input, use the Y-math result for bottom 8
+m_tdata_reg <= {s_axis_tdata[31:8], r_out}; // r_out here is actually our processed Y
             m_tvalid_reg <= s_axis_tvalid;
             m_tuser_reg  <= s_axis_tuser;
             m_tlast_reg  <= s_axis_tlast;

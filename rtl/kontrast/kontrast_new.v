@@ -146,7 +146,10 @@
             m_axis_tlast  <= 1'b0;
             m_axis_tuser  <= 1'b0;
         end else if (m_axis_tready) begin
-            m_axis_tdata  <= {8'hFF, pixel_out_comb, pixel_out_comb, pixel_out_comb};
+         ///   m_axis_tdata  <= {8'hFF, pixel_out_comb, pixel_out_comb, pixel_out_comb};
+            // OLD: {8'hFF, pixel_out_comb, pixel_out_comb, pixel_out_comb}
+// NEW: Pass through color, insert processed Y
+m_axis_tdata <= {s_axis_tdata[31:8], pixel_out_comb};
             m_axis_tvalid <= s_axis_tvalid;
             m_axis_tlast  <= s_axis_tlast;
             m_axis_tuser  <= s_axis_tuser;

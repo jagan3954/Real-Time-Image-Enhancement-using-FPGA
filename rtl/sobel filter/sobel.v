@@ -40,7 +40,8 @@ module sobel_edge #(
 
     // Control Signal Shift Registers (Delay = 5 cycles)
     reg [4:0] valid_shift, last_shift, user_shift;
-
+///
+reg [23:0] color_pipe [0:4];
     wire [7:0] pixel_in = s_axis_tdata[7:0];
 
     always @(posedge clk) begin
@@ -96,10 +97,18 @@ module sobel_edge #(
             valid_shift <= {valid_shift[3:0], s_axis_tvalid};
             last_shift  <= {last_shift[3:0],  s_axis_tlast};
             user_shift  <= {user_shift[3:0],  s_axis_tuser};
+            // ADD THESE LINES:
+            color_pipe[0] <= s_axis_tdata[31:8];
+            color_pipe[1] <= color_pipe[0];
+            color_pipe[2] <= color_pipe[1];
+            color_pipe[3] <= color_pipe[2];
+            color_pipe[4] <= color_pipe[3];
         end
     end
 
-    assign m_axis_tdata  = {8'hFF, final_pixel, final_pixel, final_pixel};
+    //assign m_axis_tdata  = {8'hFF, final_pixel, final_pixel, final_pixel};
+    // OLD: {8'hFF, final_pixel, final_pixel, final_pixel}
+    assign m_axis_tdata = {color_pipe[4], final_pixel};
     assign m_axis_tvalid = valid_shift[4];
     assign m_axis_tlast  = last_shift[4];
     assign m_axis_tuser  = user_shift[4];

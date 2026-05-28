@@ -91,6 +91,14 @@
   <FileSets Version="1" Minor="32">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
       <Filter Type="Srcs"/>
+      <File Path="$PPRDIR/../../rtl/rgba_to_gray/rgba_to_gray.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../../rtl/3x3_spatial_filter/3x3filter.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -119,7 +127,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../rtl/rgba_to_gray/rgba_to_gray.v">
+      <File Path="$PPRDIR/../../rtl/ YCbCr/rgba_ybcr.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -127,6 +135,13 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../rtl/sobel filter/sobel.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../rtl/ YCbCr/ycbr_rgba.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -270,7 +285,9 @@
     </Run>
     <Run Id="loop_again_main_img_pro_top_loop_bac_0_0_synth_1" Type="Ft3:Synth" SrcSet="loop_again_main_img_pro_top_loop_bac_0_0" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_img_pro_top_loop_bac_0_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025"/>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025">
+          <Desc>Vivado Synthesis Defaults</Desc>
+        </StratHandle>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -315,7 +332,9 @@
     </Run>
     <Run Id="loop_again_main_img_pro_top_loop_bac_0_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_img_pro_top_loop_bac_0_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="loop_again_main_img_pro_top_loop_bac_0_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_impl_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025"/>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025">
+          <Desc>Default settings for Implementation.</Desc>
+        </StratHandle>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
