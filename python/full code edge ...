@@ -1,0 +1,101 @@
+from pynq import Overlay, MMIO, allocate
+import numpy as np
+import cv2
+import time
+
+# ==========================================
+# 1. HARDWARE SETTINGS
+# ==========================================
+BITSTREAM_PATH = "Bitstreamfiles/ycbcr.bit"
+IMAGE_PATH = "test.jpg"
+
+IP_NAME = 'img_pro_top_loop_bac_0' 
+VDMA_NAME = 'axi_vdma_0'
+
+print("Loading Overlay...")
+overlay = Overlay(BITSTREAM_PATH)
+
+try:
+    # 2. SETUP MMIO
+    ctrl = MMIO(overlay.ip_dict[IP_NAME]['phys_addr'], 0x100)
+    vdma = MMIO(overlay.ip_dict[VDMA_NAME]['phys_addr'], 0x10000)
+    print("MMIO Linked Successfully.")
+
+    # 3. ALLOCATE BUFFERS
+    width, height = 640, 480
+    stride = width * 4
+    in_buf = allocate(shape=(height, width, 4), dtype=np.uint8)
+    out_buf = allocate(shape=(height, width, 4), dtype=np.uint8)
+    print("Memory Allocated.")
+
+    # 4. PREP IMAGE
+    img = cv2.imread(IMAGE_PATH)
+    if img is None:
+        raise ValueError(f"Could not find image at {IMAGE_PATH}")
+        
+    img = cv2.resize(img, (width, height))
+    in_buf[:] = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+    in_buf.flush()
+
+    # 5. VDMA RESET & CONFIG
+    print("Starting VDMA...")
+    vdma.write(0x00, 0x4) # MM2S Reset
+    vdma.write(0x30, 0x4) # S2MM Reset
+    time.sleep(0.1) 
+
+    # Set parameters in your IP
+    ctrl.write(0x00, 30)  
+    ctrl.write(0x04, 20)  
+    ctrl.write(0x08, 256) 
+
+    # Configure VDMA
+    vdma.write(0x00, 0x01) 
+    vdma.write(0x30, 0x01) 
+    
+    vdma.write(0x5C, in_buf.physical_address)
+    vdma.write(0xAC, out_buf.physical_address)
+    
+    vdma.write(0x54, stride) 
+    vdma.write(0xA4, stride) 
+    vdma.write(0x58, stride) 
+    vdma.write(0xA8, stride)
+
+    # 6. TRIGGER TRANSFER
+    vdma.write(0xA0, height) 
+    vdma.write(0x50, height) 
+
+    print("Processing Hardware Pipeline...")
+    
+    # 7. WAIT WITH TIMEOUT
+    start_time = time.time()
+    success = False
+    while time.time() - start_time < 2.0:
+        if (vdma.read(0x34) & 0x1000): 
+            success = True
+            break
+    
+    if success:
+        out_buf.invalidate()
+        print("Hardware Success! Safely saving image...")
+        
+        # CRITICAL FIX: Copy data out of physical RAM to a standard numpy array first
+        # This prevents OpenCV from seg-faulting the kernel
+        safe_array = np.copy(out_buf)
+        
+        # Convert RGBA to BGR for OpenCV
+        result_bgr = cv2.cvtColor(safe_array, cv2.COLOR_RGBA2BGR)
+        
+        # Save straight to file instead of plotting
+        cv2.imwrite("hardware_output1.jpg", result_bgr)
+        print("Done! Open 'hardware_output.jpg' in your Jupyter file browser to see the result.")
+        
+    else:
+        print("VDMA Timeout!")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+finally:
+    # Always free buffers
+    if 'in_buf' in locals(): in_buf.freebuffer()
+    if 'out_buf' in locals(): out_buf.freebuffer()
+    print("Memory safely cleaned up.")
