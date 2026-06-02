@@ -183,9 +183,6 @@
         <CompFileExtendedInfo CompFileName="loop_again_main.bd" FileRelPathName="ip/loop_again_main_rgb2dvi_0_0/loop_again_main_rgb2dvi_0_0.xci">
           <Proxy FileSetName="loop_again_main_rgb2dvi_0_0"/>
         </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="loop_again_main.bd" FileRelPathName="ip/loop_again_main_smartconnect_0_0/loop_again_main_smartconnect_0_0.xci">
-          <Proxy FileSetName="loop_again_main_smartconnect_0_0"/>
-        </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="loop_again_main.bd" FileRelPathName="ip/loop_again_main_v_axi4s_vid_out_0_0/loop_again_main_v_axi4s_vid_out_0_0.xci">
           <Proxy FileSetName="loop_again_main_v_axi4s_vid_out_0_0"/>
         </CompFileExtendedInfo>
@@ -265,12 +262,6 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="loop_again_main_img_pro_top_loop_bac_0_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/loop_again_main_img_pro_top_loop_bac_0_0" RelGenDir="$PGENDIR/loop_again_main_img_pro_top_loop_bac_0_0">
-      <Config>
-        <Option Name="TopModule" Val="loop_again_main_img_pro_top_loop_bac_0_0"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
     <FileSet Name="loop_again_main_proc_sys_reset_0_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/loop_again_main_proc_sys_reset_0_0" RelGenDir="$PGENDIR/loop_again_main_proc_sys_reset_0_0">
       <Config>
         <Option Name="TopModule" Val="loop_again_main_proc_sys_reset_0_0"/>
@@ -307,15 +298,15 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="loop_again_main_smartconnect_0_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/loop_again_main_smartconnect_0_0" RelGenDir="$PGENDIR/loop_again_main_smartconnect_0_0">
-      <Config>
-        <Option Name="TopModule" Val="loop_again_main_smartconnect_0_0"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
     <FileSet Name="loop_again_main_proc_sys_reset_1_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/loop_again_main_proc_sys_reset_1_0" RelGenDir="$PGENDIR/loop_again_main_proc_sys_reset_1_0">
       <Config>
         <Option Name="TopModule" Val="loop_again_main_proc_sys_reset_1_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="loop_again_main_img_pro_top_loop_bac_0_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/loop_again_main_img_pro_top_loop_bac_0_0" RelGenDir="$PGENDIR/loop_again_main_img_pro_top_loop_bac_0_0">
+      <Config>
+        <Option Name="TopModule" Val="loop_again_main_img_pro_top_loop_bac_0_0"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
@@ -353,16 +344,6 @@
       <RQSFiles/>
     </Run>
     <Run Id="loop_again_main_processing_system7_0_0_synth_1" Type="Ft3:Synth" SrcSet="loop_again_main_processing_system7_0_0" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_processing_system7_0_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/loop_again_main_processing_system7_0_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_processing_system7_0_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_processing_system7_0_0_synth_1" ParallelReportGen="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025"/>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2025"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="loop_again_main_img_pro_top_loop_bac_0_0_synth_1" Type="Ft3:Synth" SrcSet="loop_again_main_img_pro_top_loop_bac_0_0" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_img_pro_top_loop_bac_0_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025"/>
         <Step Id="synth_design"/>
@@ -432,11 +413,9 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="loop_again_main_smartconnect_0_0_synth_1" Type="Ft3:Synth" SrcSet="loop_again_main_smartconnect_0_0" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_smartconnect_0_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/loop_again_main_smartconnect_0_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_smartconnect_0_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_smartconnect_0_0_synth_1" ParallelReportGen="true">
+    <Run Id="loop_again_main_proc_sys_reset_1_0_synth_1" Type="Ft3:Synth" SrcSet="loop_again_main_proc_sys_reset_1_0" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_proc_sys_reset_1_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/loop_again_main_proc_sys_reset_1_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_synth_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -444,7 +423,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="loop_again_main_proc_sys_reset_1_0_synth_1" Type="Ft3:Synth" SrcSet="loop_again_main_proc_sys_reset_1_0" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_proc_sys_reset_1_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/loop_again_main_proc_sys_reset_1_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_synth_1" ParallelReportGen="true">
+    <Run Id="loop_again_main_img_pro_top_loop_bac_0_0_synth_1" Type="Ft3:Synth" SrcSet="loop_again_main_img_pro_top_loop_bac_0_0" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_img_pro_top_loop_bac_0_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_synth_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2025">
           <Desc>Vivado Synthesis Defaults</Desc>
@@ -475,23 +454,6 @@
       <RQSFiles/>
     </Run>
     <Run Id="loop_again_main_processing_system7_0_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_processing_system7_0_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="loop_again_main_processing_system7_0_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_processing_system7_0_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_processing_system7_0_0_impl_1" ParallelReportGen="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025"/>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2025"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="loop_again_main_img_pro_top_loop_bac_0_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_img_pro_top_loop_bac_0_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="loop_again_main_img_pro_top_loop_bac_0_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_impl_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025"/>
         <Step Id="init_design"/>
@@ -610,11 +572,9 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="loop_again_main_smartconnect_0_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_smartconnect_0_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="loop_again_main_smartconnect_0_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_smartconnect_0_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_smartconnect_0_0_impl_1" ParallelReportGen="true">
+    <Run Id="loop_again_main_proc_sys_reset_1_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_proc_sys_reset_1_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="loop_again_main_proc_sys_reset_1_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_impl_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -629,7 +589,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="loop_again_main_proc_sys_reset_1_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_proc_sys_reset_1_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="loop_again_main_proc_sys_reset_1_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_proc_sys_reset_1_0_impl_1" ParallelReportGen="true">
+    <Run Id="loop_again_main_img_pro_top_loop_bac_0_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z020clg400-1" ConstrsSet="loop_again_main_img_pro_top_loop_bac_0_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="loop_again_main_img_pro_top_loop_bac_0_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/loop_again_main_img_pro_top_loop_bac_0_0_impl_1" ParallelReportGen="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2025">
           <Desc>Default settings for Implementation.</Desc>

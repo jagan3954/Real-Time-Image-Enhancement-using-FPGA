@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri May 29 15:40:54 2026" VIVADOVERSION="2025.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Mon Jun  1 14:15:56 2026" VIVADOVERSION="2025.2">
 
   <SYSTEMINFO ARCH="zynq" BOARD="tul.com.tw:pynq-z2:part0:1.0" DEVICE="7z020" NAME="loop_again_main" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -4133,12 +4133,12 @@
         <PORT DIR="O" LEFT="0" NAME="interconnect_aresetn" POLARITY="ACTIVE_LOW" RIGHT="0" SIGIS="rst"/>
         <PORT DIR="I" NAME="mb_debug_sys_rst" POLARITY="ACTIVE_HIGH" SIGIS="rst"/>
         <PORT DIR="O" NAME="mb_reset" POLARITY="ACTIVE_HIGH" SIGIS="rst"/>
-        <PORT DIR="O" LEFT="0" NAME="peripheral_aresetn" POLARITY="ACTIVE_LOW" RIGHT="0" SIGIS="rst"/>
-        <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_reset">
+        <PORT DIR="O" LEFT="0" NAME="peripheral_aresetn" POLARITY="ACTIVE_LOW" RIGHT="0" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="rgb2dvi_0" PORT="aRst"/>
+            <CONNECTION INSTANCE="rgb2dvi_0" PORT="aRst_n"/>
           </CONNECTIONS>
         </PORT>
+        <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst"/>
         <PORT CLKFREQUENCY="125976562" DIR="I" NAME="slowest_sync_clk" SIGIS="clk" SIGNAME="clk_wiz_0_clk_out2">
           <CONNECTIONS>
             <CONNECTION INSTANCE="clk_wiz_0" PORT="clk_out2"/>
@@ -5188,9 +5188,9 @@
             <CONNECTION INSTANCE="axi_vdma_0" PORT="m_axis_mm2s_aclk"/>
             <CONNECTION INSTANCE="axi_vdma_0" PORT="m_axi_mm2s_aclk"/>
             <CONNECTION INSTANCE="processing_system7_0" PORT="S_AXI_HP0_ACLK"/>
-            <CONNECTION INSTANCE="img_pro_top_loop_bac_0" PORT="clk"/>
             <CONNECTION INSTANCE="axis_data_fifo_0" PORT="s_axis_aclk"/>
             <CONNECTION INSTANCE="smartconnect_0" PORT="aclk"/>
+            <CONNECTION INSTANCE="img_pro_top_loop_bac_0" PORT="clk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="FCLK_RESET0_N" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="processing_system7_0_FCLK_RESET0_N">
@@ -5717,7 +5717,7 @@
         <PARAMETER NAME="kD1Swap" VALUE="false"/>
         <PARAMETER NAME="kD2Swap" VALUE="false"/>
         <PARAMETER NAME="kGenerateSerialClk" VALUE="false"/>
-        <PARAMETER NAME="kRstActiveHigh" VALUE="true"/>
+        <PARAMETER NAME="kRstActiveHigh" VALUE="false"/>
         <PARAMETER NAME="Component_Name" VALUE="loop_again_main_rgb2dvi_0_0"/>
         <PARAMETER NAME="TMDS_BOARD_INTERFACE"/>
         <PARAMETER NAME="EDK_IPTYPE" VALUE="PERIPHERAL"/>
@@ -5753,9 +5753,9 @@
             <CONNECTION INSTANCE="loop_again_main_imp" PORT="TMDS_0_data_p"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="aRst" POLARITY="ACTIVE_HIGH" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_reset">
+        <PORT DIR="I" NAME="aRst_n" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="proc_sys_reset_1_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_reset"/>
+            <CONNECTION INSTANCE="proc_sys_reset_1" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" LEFT="23" NAME="vid_pData" RIGHT="0" SIGIS="undef" SIGNAME="rgb2dvi_0_vid_pData">
@@ -5831,8 +5831,8 @@
         <PORT DIR="O" NAME="mb_reset" POLARITY="ACTIVE_HIGH" SIGIS="rst"/>
         <PORT DIR="O" LEFT="0" NAME="peripheral_aresetn" POLARITY="ACTIVE_LOW" RIGHT="0" SIGIS="rst" SIGNAME="rst_ps7_0_100M_peripheral_aresetn">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="img_pro_top_loop_bac_0" PORT="rst_n"/>
             <CONNECTION INSTANCE="smartconnect_0" PORT="aresetn"/>
+            <CONNECTION INSTANCE="img_pro_top_loop_bac_0" PORT="rst_n"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst"/>
@@ -6185,7 +6185,11 @@
             <CONNECTION INSTANCE="axis_subset_converter_0" PORT="m_axis_tvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="sof_state_out" SIGIS="undef"/>
+        <PORT DIR="O" NAME="sof_state_out" SIGIS="undef" SIGNAME="v_axi4s_vid_out_0_sof_state_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="v_tc_0" PORT="sof_state"/>
+          </CONNECTIONS>
+        </PORT>
         <PORT DIR="O" LEFT="31" NAME="status" RIGHT="0" SIGIS="undef"/>
         <PORT DIR="O" NAME="underflow" SIGIS="undef"/>
         <PORT DIR="O" NAME="vid_active_video" SIGIS="undef" SIGNAME="rgb2dvi_0_vid_pVDE">
@@ -6507,7 +6511,11 @@
             <CONNECTION INSTANCE="proc_sys_reset_0" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="sof_state" SIGIS="undef"/>
+        <PORT DIR="I" NAME="sof_state" SIGIS="undef" SIGNAME="v_axi4s_vid_out_0_sof_state_out">
+          <CONNECTIONS>
+            <CONNECTION INSTANCE="v_axi4s_vid_out_0" PORT="sof_state_out"/>
+          </CONNECTIONS>
+        </PORT>
         <PORT DIR="I" NAME="vblank_in" SIGIS="undef"/>
         <PORT DIR="O" NAME="vblank_out" SIGIS="undef" SIGNAME="v_axi4s_vid_out_0_vtg_vblank">
           <CONNECTIONS>

@@ -2505,6 +2505,10 @@
               "M01_AXI"
             ],
             "bd_attributes": {
+              "BRIDGES": {
+                "value": "M00_AXI:M01_AXI",
+                "value_src": "auto"
+              },
               "TYPE": {
                 "value": "interior",
                 "value_src": "default"
@@ -2592,6 +2596,9 @@
         "has_run_ip_tcl": "true",
         "parameters": {
           "kGenerateSerialClk": {
+            "value": "false"
+          },
+          "kRstActiveHigh": {
             "value": "false"
           }
         }
@@ -3052,10 +3059,10 @@
           "proc_sys_reset_0/peripheral_reset"
         ]
       },
-      "proc_sys_reset_1_peripheral_reset": {
+      "proc_sys_reset_1_peripheral_aresetn": {
         "ports": [
-          "proc_sys_reset_1/peripheral_reset",
-          "rgb2dvi_0/aRst"
+          "proc_sys_reset_1/peripheral_aresetn",
+          "rgb2dvi_0/aRst_n"
         ]
       },
       "processing_system7_0_FCLK_CLK0": {
@@ -3068,9 +3075,9 @@
           "axi_vdma_0/m_axis_mm2s_aclk",
           "axi_vdma_0/m_axi_mm2s_aclk",
           "processing_system7_0/S_AXI_HP0_ACLK",
-          "img_pro_top_loop_bac_0/clk",
           "axis_data_fifo_0/s_axis_aclk",
-          "smartconnect_0/aclk"
+          "smartconnect_0/aclk",
+          "img_pro_top_loop_bac_0/clk"
         ]
       },
       "processing_system7_0_FCLK_RESET0_N": {
@@ -3090,14 +3097,20 @@
       "rst_ps7_0_100M_peripheral_aresetn": {
         "ports": [
           "rst_ps7_0_100M/peripheral_aresetn",
-          "img_pro_top_loop_bac_0/rst_n",
-          "smartconnect_0/aresetn"
+          "smartconnect_0/aresetn",
+          "img_pro_top_loop_bac_0/rst_n"
         ]
       },
       "sys_clock_1": {
         "ports": [
           "sys_clock",
           "clk_wiz_0/clk_in1"
+        ]
+      },
+      "v_axi4s_vid_out_0_sof_state_out": {
+        "ports": [
+          "v_axi4s_vid_out_0/sof_state_out",
+          "v_tc_0/sof_state"
         ]
       }
     },
