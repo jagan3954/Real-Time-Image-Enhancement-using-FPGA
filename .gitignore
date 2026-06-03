@@ -19,6 +19,13 @@
 *.wdb
 *.vcd
 
+vivado/**/*.cache/
+vivado/**/*.gen/
+vivado/**/*.runs/
+vivado/**/*.hw/
+vivado/**/*.ip_user_files/
+vivado/**/*.sim/
+
 # Ignore bitstreams
 *.bit
 *.bin
