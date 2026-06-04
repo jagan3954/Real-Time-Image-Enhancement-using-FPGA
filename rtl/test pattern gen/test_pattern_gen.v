@@ -1,78 +1,153 @@
-module test_pattern_gen (
-    input  wire        pclk,
-    input  wire        rst_n,
-    output reg         hSync,
-    output reg         vSync,
-    output reg         de,
-    output reg  [23:0] rgb
+////module pl_tpg (
+////    input  wire        clk,           // 148.5 MHz
+////    input  wire        rst_n,         // active low reset
+////    // AXI4-Stream Master
+////    output reg  [23:0] m_axis_tdata,
+////    output reg         m_axis_tvalid,
+////    input  wire        m_axis_tready,
+////    output reg         m_axis_tlast,  // end of line
+////    output reg         m_axis_tuser   // start of frame
+////);
+//module pl_tpg (
+//    input  wire        clk,
+//    input  wire        rst_n,
+//    // AXI4-Stream Master
+//    output reg  [23:0] m_axis_tdata,
+//    output reg         m_axis_tvalid,
+//    input  wire        m_axis_tready,
+//    output reg         m_axis_tlast,
+//    output reg         m_axis_tuser,
+//    // Debug LED
+//    output wire        led
+//);
+//    // 1080p timing
+//    localparam H_ACTIVE = 1920;
+//    localparam H_TOTAL  = 2200;
+//    localparam V_ACTIVE = 1080;
+//    localparam V_TOTAL  = 1125;
+
+//    reg [11:0] h_cnt = 0;
+//    reg [11:0] v_cnt = 0;
+
+//    // Counters
+//    always @(posedge clk) begin
+//        if (!rst_n) begin
+//            h_cnt <= 0;
+//            v_cnt <= 0;
+//        end else if (m_axis_tready) begin
+//            if (h_cnt == H_TOTAL - 1) begin
+//                h_cnt <= 0;
+//                if (v_cnt == V_TOTAL - 1) v_cnt <= 0;
+//                else                      v_cnt <= v_cnt + 1;
+//            end else begin
+//                h_cnt <= h_cnt + 1;
+//            end
+//        end
+//    end
+
+//    // 8 vertical color bars
+//    wire [2:0] bar = h_cnt[11:9];  // 1920/8 = 240 pixels per bar
+
+//    // AXI4-Stream signals
+//    always @(posedge clk) begin
+//        if (!rst_n) begin
+//            m_axis_tvalid <= 1'b0;
+//            m_axis_tlast  <= 1'b0;
+//            m_axis_tuser  <= 1'b0;
+//            m_axis_tdata  <= 24'd0;
+//        end else if (m_axis_tready) begin
+//            m_axis_tvalid <= (h_cnt < H_ACTIVE) && (v_cnt < V_ACTIVE);
+//            m_axis_tlast  <= (h_cnt == H_ACTIVE - 1);
+//            m_axis_tuser  <= (h_cnt == 0) && (v_cnt == 0);
+            
+//            case (bar)
+//                3'd0: m_axis_tdata <= 24'hFF0000; // Red
+//                3'd1: m_axis_tdata <= 24'h00FF00; // Green
+//                3'd2: m_axis_tdata <= 24'h0000FF; // Blue
+//                3'd3: m_axis_tdata <= 24'hFFFF00; // Yellow
+//                3'd4: m_axis_tdata <= 24'h00FFFF; // Cyan
+//                3'd5: m_axis_tdata <= 24'hFF00FF; // Magenta
+//                3'd6: m_axis_tdata <= 24'hFFFFFF; // White
+//                3'd7: m_axis_tdata <= 24'h000000; // Black
+//            endcase
+//        end
+//    end
+//    // LED blinker - toggles every ~0.5 seconds at 148.5 MHz
+//    reg [26:0] led_cnt = 0;
+//    always @(posedge clk) begin
+//        if (!rst_n) led_cnt <= 0;
+//        else led_cnt <= led_cnt + 1;
+//    end
+//    assign led = led_cnt[26];  // Slow blink
+
+
+//endmodule
+module pl_tpg_native (
+    input  wire        clk,           // 148.5 MHz
+    input  wire        rst_n,         // active low reset
+    output reg  [23:0] vid_data,      // RGB24
+    output reg         vid_hsync,     // horizontal sync
+    output reg         vid_vsync,     // vertical sync
+    output reg         vid_active_video  // data enable
 );
 
-// 1080p 60Hz timing
-parameter H_ACTIVE = 1920;
-parameter H_FP     = 88;
-parameter H_SYNC   = 44;
-parameter H_BP     = 148;
-parameter H_TOTAL  = 2200;
+    // 1080p timing
+    localparam H_ACTIVE = 1920;
+    localparam H_TOTAL  = 2200;
+    localparam H_SYNC_START = 2008;
+    localparam H_SYNC_END   = 2052;
+    localparam V_ACTIVE = 1080;
+    localparam V_TOTAL  = 1125;
+    localparam V_SYNC_START = 1084;
+    localparam V_SYNC_END   = 1089;
 
-parameter V_ACTIVE = 1080;
-parameter V_FP     = 4;
-parameter V_SYNC   = 5;
-parameter V_BP     = 36;
-parameter V_TOTAL  = 1125;
+    reg [11:0] h_cnt = 0;
+    reg [11:0] v_cnt = 0;
 
-reg [11:0] h_cnt;
-reg [11:0] v_cnt;
-
-// Horizontal and vertical counters
-always @(posedge pclk or negedge rst_n) begin
-    if (!rst_n) begin
-        h_cnt <= 0;
-        v_cnt <= 0;
-    end else begin
-        if (h_cnt == H_TOTAL - 1) begin
+    always @(posedge clk) begin
+        if (!rst_n) begin
             h_cnt <= 0;
-            if (v_cnt == V_TOTAL - 1)
-                v_cnt <= 0;
-            else
-                v_cnt <= v_cnt + 1;
+            v_cnt <= 0;
         end else begin
-            h_cnt <= h_cnt + 1;
+            if (h_cnt == H_TOTAL - 1) begin
+                h_cnt <= 0;
+                if (v_cnt == V_TOTAL - 1) v_cnt <= 0;
+                else                      v_cnt <= v_cnt + 1;
+            end else begin
+                h_cnt <= h_cnt + 1;
+            end
         end
     end
-end
 
-// Active area
-wire h_active = (h_cnt < H_ACTIVE);
-wire v_active = (v_cnt < V_ACTIVE);
+    // Color bars
+    wire [2:0] bar = h_cnt[11:9];
+    reg [23:0] pixel;
+    always @(*) begin
+        case (bar)
+            3'd0: pixel = 24'hFF0000;
+            3'd1: pixel = 24'h00FF00;
+            3'd2: pixel = 24'h0000FF;
+            3'd3: pixel = 24'hFFFF00;
+            3'd4: pixel = 24'h00FFFF;
+            3'd5: pixel = 24'hFF00FF;
+            3'd6: pixel = 24'hFFFFFF;
+            3'd7: pixel = 24'h000000;
+        endcase
+    end
 
-// Output signals
-always @(posedge pclk or negedge rst_n) begin
-    if (!rst_n) begin
-        de    <= 0;
-        hSync <= 0;
-        vSync <= 0;
-        rgb   <= 0;
-    end else begin
-        de    <= h_active && v_active;
-        hSync <= (h_cnt >= H_ACTIVE + H_FP) && 
-                 (h_cnt < H_ACTIVE + H_FP + H_SYNC);
-        vSync <= (v_cnt >= V_ACTIVE + V_FP) && 
-                 (v_cnt < V_ACTIVE + V_FP + V_SYNC);
-
-        if (h_active && v_active) begin
-            // 8 color bars across 1920 pixels = 240 pixels each
-            if      (h_cnt < 240)  rgb <= 24'hFFFFFF; // white
-            else if (h_cnt < 480)  rgb <= 24'hFFFF00; // yellow
-            else if (h_cnt < 720)  rgb <= 24'h00FFFF; // cyan
-            else if (h_cnt < 960)  rgb <= 24'h00FF00; // green
-            else if (h_cnt < 1200) rgb <= 24'hFF00FF; // magenta
-            else if (h_cnt < 1440) rgb <= 24'hFF0000; // red
-            else if (h_cnt < 1680) rgb <= 24'h0000FF; // blue
-            else                   rgb <= 24'h000000; // black
+    // Native video outputs
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            vid_data <= 0;
+            vid_hsync <= 0;
+            vid_vsync <= 0;
+            vid_active_video <= 0;
         end else begin
-            rgb <= 24'h000000;
+            vid_active_video <= (h_cnt < H_ACTIVE) && (v_cnt < V_ACTIVE);
+            vid_hsync <= (h_cnt >= H_SYNC_START) && (h_cnt < H_SYNC_END);
+            vid_vsync <= (v_cnt >= V_SYNC_START) && (v_cnt < V_SYNC_END);
+            vid_data <= pixel;
         end
     end
-end
 
 endmodule
