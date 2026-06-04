@@ -1,23 +1,6 @@
-# =========================
-# Vivado Generated Junk
-# =========================
-
-*.cache
-*.gen
-*.runs
-*.hw
-*.ip_user_files
-*.jou
-*.log
-*.str
-*.tmp
-*.backup
-.Xil
-*.sim/
-
-# Ignore simulation junk only
-*.wdb
-*.vcd
+# =====================================
+# Vivado Generated Files (IGNORE)
+# =====================================
 
 vivado/**/*.cache/
 vivado/**/*.gen/
@@ -26,19 +9,52 @@ vivado/**/*.hw/
 vivado/**/*.ip_user_files/
 vivado/**/*.sim/
 
-# Ignore bitstreams
-*.bit
-*.bin
+# Vivado logs and temporary files
+*.jou
+*.log
+*.str
+*.tmp
+*.backup
+.Xil
 
-# Python
+# =====================================
+# Simulation Files (IGNORE)
+# =====================================
+
+*.wdb
+*.vcd
+
+# =====================================
+# Python Cache (IGNORE)
+# =====================================
+
 __pycache__/
 *.pyc
 
-# =========================
-# Exceptions (Files we WANT)
-# =========================
+# =====================================
+# Bitstreams (IGNORE BY DEFAULT)
+# =====================================
 
-# Allow the Bitstream folder and everything inside it
+*.bit
+*.bin
+*.hwh
+
+# =====================================
+# Exceptions (TRACK THESE)
+# =====================================
+
 !Bitstreamfiles/
 !Bitstreamfiles/*.bit
 !Bitstreamfiles/*.hwh
+
+# =====================================
+# KEEP IMPORTANT VIVADO FILES
+# =====================================
+
+# These are NOT ignored:
+# *.xpr
+# *.srcs/
+# *.bd
+# *.bda
+# *.xci
+# *.xdc
