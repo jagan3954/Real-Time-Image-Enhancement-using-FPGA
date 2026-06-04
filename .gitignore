@@ -1,5 +1,5 @@
 # =====================================
-# Vivado Generated Files (IGNORE)
+# Vivado Generated Folders
 # =====================================
 
 vivado/**/*.cache/
@@ -9,30 +9,54 @@ vivado/**/*.hw/
 vivado/**/*.ip_user_files/
 vivado/**/*.sim/
 
-# Vivado logs and temporary files
+# =====================================
+# Vivado Logs & Temporary Files
+# =====================================
+
 *.jou
 *.log
 *.str
 *.tmp
 *.backup
-.Xil
+
+.Xil/
+**/.Xil/
 
 # =====================================
-# Simulation Files (IGNORE)
+# Vivado Reports & Checkpoints
+# =====================================
+
+*.dcp
+*.rpt
+*.pb
+*.pbx
+
+# =====================================
+# Simulation Files
 # =====================================
 
 *.wdb
 *.vcd
 
+xsim.dir/
+**/xsim.dir/
+
 # =====================================
-# Python Cache (IGNORE)
+# Python
 # =====================================
 
 __pycache__/
 *.pyc
 
 # =====================================
-# Bitstreams (IGNORE BY DEFAULT)
+# Local Backup Folders
+# =====================================
+
+*_backup/
+backup/
+
+# =====================================
+# Ignore Generated Bitstreams by Default
 # =====================================
 
 *.bit
@@ -40,7 +64,7 @@ __pycache__/
 *.hwh
 
 # =====================================
-# Exceptions (TRACK THESE)
+# KEEP RELEASED FPGA OUTPUTS
 # =====================================
 
 !Bitstreamfiles/
@@ -48,13 +72,15 @@ __pycache__/
 !Bitstreamfiles/*.hwh
 
 # =====================================
-# KEEP IMPORTANT VIVADO FILES
+# KEEP IMPORTANT VIVADO PROJECT FILES
 # =====================================
 
-# These are NOT ignored:
+# DO NOT IGNORE:
 # *.xpr
 # *.srcs/
 # *.bd
 # *.bda
 # *.xci
 # *.xdc
+# *.v
+# *.sv
