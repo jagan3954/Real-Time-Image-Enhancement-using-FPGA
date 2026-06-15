@@ -88,3 +88,6 @@ else:
 vdma = overlay.axi_vdma_0
 # Set up your frame buffer and trigger the VDMA here...
 
+```
+###OUTPUT:
+<img width="1024" height="449" alt="image" src="https://github.com/user-attachments/assets/9fd32b11-10ac-4759-b15f-21839e3b4b58" />
