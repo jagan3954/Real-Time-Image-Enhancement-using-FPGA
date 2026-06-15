@@ -76,7 +76,8 @@ class HardwareVisionPipeline:
     def __init__(self, bitstream_path):
         # 1. Load the perfectly-timed Hardware!
         print("Loading Bitstream...")
-        self.overlay = Overlay(bitstream_path)
+        self.overlay = Overlay(bitstream_path) //use │   ├── fix.bit, fix.hwh from the Bitstream folder
+
         
         # 2. Setup AXI Connections
         self.ctrl = MMIO(self.overlay.ip_dict['img_pro_top_loop_bac_0']['phys_addr'], 0x100)
