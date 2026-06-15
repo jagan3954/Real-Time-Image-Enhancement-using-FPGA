@@ -68,7 +68,7 @@ from pynq import Overlay, allocate, MMIO
 import numpy as np
 
 # 1. Load the Overlay
-overlay = Overlay("loop_again_main.bit")
+overlay = Overlay("loop_again_main.bit") // use latest Bit file from the bitsreamfiles
 
 # 2. Configure VTC (Video Timing Controller)
 VTC_ADDR = 0x43C10000 
