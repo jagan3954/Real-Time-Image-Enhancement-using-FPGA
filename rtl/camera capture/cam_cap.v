@@ -1,21 +1,93 @@
-module camera_capture #(
-    parameter H_ACTIVE = 640,   // Change to 1920 for 1080p, 1280 for 720p
-    parameter V_ACTIVE = 480    // Change to 1080 or 720
+//(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TDATA" *)
+//(* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF=m_axis, ASSOCIATED_RESET=rst_n" *)
+//module camera_capture #(
+//    parameter H_ACTIVE = 640,   // Change to 1920 for 1080p, 1280 for 720p
+//    parameter V_ACTIVE = 480    // Change to 1080 or 720
+//)(
+//(* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF=m_axis" *)
+//    input  wire        pclk,
+//    input  wire        rst_n,
+//    // Camera interface
+//    input  wire        vsync,
+//    input  wire        href,
+//    input  wire [7:0]  d,
+    
+//    // AXI4-Stream Master
+//    output reg         m_axis_tvalid,
+//    output reg  [23:0] m_axis_tdata,
+//    output reg         m_axis_tuser,
+//    module camera_capture #(
+//    parameter H_ACTIVE = 640,   // Change to 1920 for 1080p, 1280 for 720p
+//    parameter V_ACTIVE = 480    // Change to 1080 or 720
+//)(
+//    //(* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF=m_axis, ASSOCIATED_RESET=rst_n" *)
+//    input  wire        pclk,
+//    input  wire        rst_n,
+//    // Camera interface
+//    input  wire        vsync,
+//    input  wire        href,
+//    input  wire [7:0]  d,
+    
+//    // AXI4-Stream Master
+//    output reg         m_axis_tvalid,
+//    output reg  [23:0] m_axis_tdata,
+//    output reg         m_axis_tuser,
+//    // ... rest of code
+//    output reg         m_axis_tlast
+//);
+//module camera_capture #(
+//    parameter H_ACTIVE = 640,
+//    parameter V_ACTIVE = 480
+//)(
+//    // Associated Clocks and Resets for the Block Design Engine
+//    (* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF=m_axis, ASSOCIATED_RESET=rst_n" *)
+//    input  wire        pclk,
+//    input  wire        rst_n,
+
+//    // Camera Input Interface 
+//    input  wire        vsync,
+//    input  wire        href,
+//    input  wire [7:0]  d,
+    
+//    // Explicitly Mapped AXI4-Stream Master Ports
+//    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TVALID" *)
+//    output reg         m_axis_tvalid,
+    
+//    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TDATA" *)
+//    output reg  [23:0] m_axis_tdata,
+    
+//    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TUSER" *)
+//    output reg         m_axis_tuser,
+
+//    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TLAST" *)
+//    output reg         m_axis_tlast
+//);
+    module camera_capture #(
+    parameter H_ACTIVE = 640,
+    parameter V_ACTIVE = 480
 )(
+    // 1. This exact line tells Vivado that pclk is the clock for m_axis and rst_n
+    (* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF=m_axis, ASSOCIATED_RESET=rst_n" *)
     input  wire        pclk,
+    
     input  wire        rst_n,
-    // Camera interface
     input  wire        vsync,
     input  wire        href,
     input  wire [7:0]  d,
-    // AXI4-Stream Master
+    
+    // 2. These exact lines bundle your outputs into a formal AXI-Stream Master Interface
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TVALID" *)
     output reg         m_axis_tvalid,
+    
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TDATA" *)
     output reg  [23:0] m_axis_tdata,
+    
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TUSER" *)
     output reg         m_axis_tuser,
+
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TLAST" *)
     output reg         m_axis_tlast
 );
-(* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis TDATA" *)
-(* X_INTERFACE_PARAMETER = "XILINX_LEGACY_IP_NAME=camera_capture, ASSOCIATED_BUSIF=m_axis, ASSOCIATED_RESET=rst_n" *)
     reg [7:0]  d_latch;
     reg        byte_idx;
     reg [15:0] pixel_cnt;
