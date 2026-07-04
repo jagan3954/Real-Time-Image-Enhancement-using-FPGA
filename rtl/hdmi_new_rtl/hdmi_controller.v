@@ -11,61 +11,57 @@ module hdmi_controller(
 
 //////////////////////////////////////////////////////////////////////////////////
 // Clock Generator Instantiation
-//////////////////////////////////////////////////////////////////////////////////
-    wire    clk_pix;
+wire    clk_pix;
     wire    clk_tmds;    
     
     clock_gen #(
-        .MULT_MASTER (63.375    ),  // master clock multiplier (2.000-64.000)
-        .DIV_MASTER  (11        ),  // master clock divider (1-106)
-        .DIV_PIX     (10        ),  // pixel clock divider (1-128)
-        .DIV_TMDS    (1         ),  // tmds clock divider (1-128)
-        .IN_PERIOD   (8         )   // period of master clock in ns
+        .MULT_MASTER (36.25),  // 125MHz * 36.25 = 4531.25 MHz Master VCO
+        .DIV_MASTER  (5),     // 4531.25 / 5 = 906.25 MHz
+        .DIV_PIX     (36),    // 906.25 / 36 = 25.17 MHz (~25.2 MHz Pixel Clock)
+        .DIV_TMDS    (3.6),   // 906.25 / 3.6 = 251.73 MHz (~252 MHz TMDS Clock)
+        .IN_PERIOD   (8)      // 125MHz is an 8ns period
     ) clock_gen_inst (
-        .clk        (clk        ),  // Input Clock 125MHz
-        .clk_pix    (clk_pix    ),  // pixel clock output
-        .clk_tmds   (clk_tmds   )   // tmds clock output
+        .clk        (clk        ),  
+        .clk_pix    (clk_pix    ),  
+        .clk_tmds   (clk_tmds   )   
     );
-
 //////////////////////////////////////////////////////////////////////////////////
 // Sync Signal Generator Instantiation
 //////////////////////////////////////////////////////////////////////////////////
-    wire [11:0] sx, sy;
+wire [11:0] sx, sy;
     wire hsync, vsync, de;
     
     sync_gen #(
-        // horizontal timings
-        .HA_END     (1365),  // end of active pixels
-        .HS_STA     (1379),  // sync starts after front porch
-        .HS_END     (1435),  // sync ends
-        .LINE       (1499),  // last pixel on line (after back porch)
+        // horizontal timings (Total line width = 800 pixels)
+        .HA_END     (639),   // Active Video: 640 pixels
+        .HS_STA     (655),   // Front Porch: 16 pixels
+        .HS_END     (751),   // Sync Pulse: 96 pixels
+        .LINE       (799),   // Back Porch: 48 pixels (Total = 800)
     
-        // vertical timings
-        .VA_END     (767),  // end of active pixels
-        .VS_STA     (768),  // sync starts after front porch
-        .VS_END     (771),  // sync ends
-        .SCREEN     (799)   // last line on screen (after back porch)
+        // vertical timings (Total screen height = 525 lines)
+        .VA_END     (479),   // Active Video: 480 lines
+        .VS_STA     (489),   // Front Porch: 10 lines
+        .VS_END     (491),   // Sync Pulse: 2 lines
+        .SCREEN     (524)    // Back Porch: 33 lines (Total = 525)
     ) sync_gen_inst (
-        .clk_pix    (clk_pix    ),     // pixel clock
-        .sx         (sx         ),     // horizontal screen position
-        .sy         (sy         ),     // vertical screen position
-        .hsync      (hsync      ),     // horizontal sync
-        .vsync      (vsync      ),     // vertical sync
-        .de         (de         )      // data enable (low in blanking interval)
+        .clk_pix    (clk_pix    ),     
+        .sx         (sx         ),     
+        .sy         (sy         ),     
+        .hsync      (hsync      ),     
+        .vsync      (vsync      ),     
+        .de         (de         )      
     );
-
 /////////////////////////////////////////////////////////////////////////////////
 // 8 Colour Strip Pattern Generator Logic
 ////////////////////////////////////////////////////////////////////////////////
-    reg [7:0] red, green, blue;
+reg [7:0] red, green, blue;
     always@(posedge clk_pix)
     begin
-        red <= (sx >= 683) ? 8'hFF : 8'h00;
-        green <= ((sx >= 341 && sx <= 682) || (sx >= 1025)) ? 8'hFF : 8'h00;
-        blue <= ((sx >= 170 && sx <= 340) || (sx >= 512 && sx <= 682) || 
-                 (sx >= 854 && sx <= 1024) || (sx >= 1195)) ? 8'hFF : 8'h00;
+        red   <= (sx >= 320) ? 8'hFF : 8'h00;
+        green <= ((sx >= 160 && sx <= 319) || (sx >= 480)) ? 8'hFF : 8'h00;
+        blue  <= ((sx >= 80 && sx <= 159) || (sx >= 240 && sx <= 319) || 
+                 (sx >= 400 && sx <= 479) || (sx >= 560)) ? 8'hFF : 8'h00;
     end
-
 /////////////////////////////////////////////////////////////////////////////////
 // TMDS Encoder Instntiation
 ////////////////////////////////////////////////////////////////////////////////

@@ -33,6 +33,7 @@ module clock_gen #(
         .CLKFBIN(clk_fb)                // 1-bit input: Feedback clock
     );
     
+    
     // buffer pixel clock output
     BUFG bufg_clk_pix(
         .I(clk_pix_unbuf), 

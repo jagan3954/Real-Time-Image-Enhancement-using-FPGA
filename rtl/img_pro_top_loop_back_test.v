@@ -38,10 +38,12 @@ module img_pro_top_loop_back_test(
     // =========================================================
     // 1. Control Wires (From AXI-Lite Slave)
     // =========================================================
-    wire [7:0]  brightness_ctrl;
-    wire [7:0]  min_val_ctrl;
-    wire [15:0] scale_factor_ctrl;
-
+//    wire [7:0]  brightness_ctrl;
+//    wire [7:0]  min_val_ctrl;
+//    wire [15:0] scale_factor_ctrl;
+wire [7:0]  brightness_ctrl   = 8'd80;
+wire [7:0]  min_val_ctrl      = 8'd10;
+wire [15:0] scale_factor_ctrl = 16'd256;
     // =========================================================
     // 2. Pipeline "Glue" Wires (The data highway)
     // =========================================================
@@ -70,30 +72,33 @@ module img_pro_top_loop_back_test(
     // 3. Module Instantiations
     // =========================================================
 
-    axi_lite_slave ctrl_unit (
-        .S_AXI_ACLK    (clk),
-        .S_AXI_ARESETN (rst_n),
-        .S_AXI_AWADDR  (s_axi_awaddr),
-        .S_AXI_AWVALID (s_axi_awvalid),
-        .S_AXI_AWREADY (s_axi_awready),
-        .S_AXI_WDATA   (s_axi_wdata),
-        .S_AXI_WSTRB   (s_axi_wstrb),
-        .S_AXI_WVALID  (s_axi_wvalid),
-        .S_AXI_WREADY  (s_axi_wready),
-        .S_AXI_BRESP   (s_axi_bresp),
-        .S_AXI_BVALID  (s_axi_bvalid),
-        .S_AXI_BREADY  (s_axi_bready),
-        .S_AXI_ARADDR  (s_axi_araddr),
-        .S_AXI_ARVALID (s_axi_arvalid),
-        .S_AXI_ARREADY (s_axi_arready),
-        .S_AXI_RDATA   (s_axi_rdata),
-        .S_AXI_RRESP   (s_axi_rresp),
-        .S_AXI_RVALID  (s_axi_rvalid),
-        .S_AXI_RREADY  (s_axi_rready),
-        .brightness_val(brightness_ctrl),
-        .min_val       (min_val_ctrl),
-        .scale_factor  (scale_factor_ctrl)
-    );
+//    axi_lite_slave ctrl_unit (
+//        .S_AXI_ACLK    (clk),
+//        .S_AXI_ARESETN (rst_n),
+//        .S_AXI_AWADDR  (s_axi_awaddr),
+//        .S_AXI_AWVALID (s_axi_awvalid),
+//        .S_AXI_AWREADY (s_axi_awready),
+//        .S_AXI_WDATA   (s_axi_wdata),
+//        .S_AXI_WSTRB   (s_axi_wstrb),
+//        .S_AXI_WVALID  (s_axi_wvalid),
+//        .S_AXI_WREADY  (s_axi_wready),
+//        .S_AXI_BRESP   (s_axi_bresp),
+//        .S_AXI_BVALID  (s_axi_bvalid),
+//        .S_AXI_BREADY  (s_axi_bready),
+//        .S_AXI_ARADDR  (s_axi_araddr),
+//        .S_AXI_ARVALID (s_axi_arvalid),
+//        .S_AXI_ARREADY (s_axi_arready),
+//        .S_AXI_RDATA   (s_axi_rdata),
+//        .S_AXI_RRESP   (s_axi_rresp),
+//        .S_AXI_RVALID  (s_axi_rvalid),
+//        .S_AXI_RREADY  (s_axi_rready),
+//        .brightness_val(brightness_ctrl),
+//        .min_val       (min_val_ctrl),
+//        .scale_factor  (scale_factor_ctrl)
+//    );
+wire [7:0]  brightness_ctrl   = 8'd80;
+wire [7:0]  min_val_ctrl      = 8'd10;
+wire [15:0] scale_factor_ctrl = 16'd256;
 
     rgba_to_ycbcr u_ycbcr_entrance (
         .clk           (clk),

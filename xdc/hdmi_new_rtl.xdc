@@ -31,3 +31,6 @@ set_property -dict {PACKAGE_PIN J19 IOSTANDARD TMDS_33} [get_ports {TMDSn[1]}]
 
 set_property -dict {PACKAGE_PIN J18 IOSTANDARD TMDS_33} [get_ports {TMDSp[2]}]
 set_property -dict {PACKAGE_PIN H18 IOSTANDARD TMDS_33} [get_ports {TMDSn[2]}]
+
+## Tell Vivado to handle the internal MMCM clock relationships as a synchronous group
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins clock_gen_inst/MMCME2_BASE_inst/CLKOUT0]] -group [get_clocks -of_objects [get_pins clock_gen_inst/MMCME2_BASE_inst/CLKOUT1]]
