@@ -1,167 +1,36 @@
+
+`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// HDMI Displat Driver Module
+
 //////////////////////////////////////////////////////////////////////////////////
-module hdmi_controller(
-	input          clk,              // 125MHz
-	output [2:0]   TMDSp, 
-	output [2:0]   TMDSn,
-	output         TMDSp_clock, 
-	output         TMDSn_clock
+
+
+module vga_ctrl(
+    input  wire clk25, rst,
+    output wire hsync, vsync,
+    output wire [9:0] x, y,
+    output wire video_on
 );
+    // VGA timing
+    localparam H_ACTIVE=640, H_FP=16, H_SYNC=96, H_BP=48, H_TOTAL=800;
+    localparam V_ACTIVE=480, V_FP=10, V_SYNC=2, V_BP=33, V_TOTAL=525;
 
-//////////////////////////////////////////////////////////////////////////////////
-// Clock Generator Instantiation
-wire    clk_pix;
-    wire    clk_tmds;    
-    
-    clock_gen #(
-        .MULT_MASTER (36.25),  // 125MHz * 36.25 = 4531.25 MHz Master VCO
-        .DIV_MASTER  (5),     // 4531.25 / 5 = 906.25 MHz
-        .DIV_PIX     (36),    // 906.25 / 36 = 25.17 MHz (~25.2 MHz Pixel Clock)
-        .DIV_TMDS    (3.6),   // 906.25 / 3.6 = 251.73 MHz (~252 MHz TMDS Clock)
-        .IN_PERIOD   (8)      // 125MHz is an 8ns period
-    ) clock_gen_inst (
-        .clk        (clk        ),  
-        .clk_pix    (clk_pix    ),  
-        .clk_tmds   (clk_tmds   )   
-    );
-//////////////////////////////////////////////////////////////////////////////////
-// Sync Signal Generator Instantiation
-//////////////////////////////////////////////////////////////////////////////////
-wire [11:0] sx, sy;
-    wire hsync, vsync, de;
-    
-    sync_gen #(
-        // horizontal timings (Total line width = 800 pixels)
-        .HA_END     (639),   // Active Video: 640 pixels
-        .HS_STA     (655),   // Front Porch: 16 pixels
-        .HS_END     (751),   // Sync Pulse: 96 pixels
-        .LINE       (799),   // Back Porch: 48 pixels (Total = 800)
-    
-        // vertical timings (Total screen height = 525 lines)
-        .VA_END     (479),   // Active Video: 480 lines
-        .VS_STA     (489),   // Front Porch: 10 lines
-        .VS_END     (491),   // Sync Pulse: 2 lines
-        .SCREEN     (524)    // Back Porch: 33 lines (Total = 525)
-    ) sync_gen_inst (
-        .clk_pix    (clk_pix    ),     
-        .sx         (sx         ),     
-        .sy         (sy         ),     
-        .hsync      (hsync      ),     
-        .vsync      (vsync      ),     
-        .de         (de         )      
-    );
-/////////////////////////////////////////////////////////////////////////////////
-// 8 Colour Strip Pattern Generator Logic
-////////////////////////////////////////////////////////////////////////////////
-reg [7:0] red, green, blue;
-    always@(posedge clk_pix)
-    begin
-        red   <= (sx >= 320) ? 8'hFF : 8'h00;
-        green <= ((sx >= 160 && sx <= 319) || (sx >= 480)) ? 8'hFF : 8'h00;
-        blue  <= ((sx >= 80 && sx <= 159) || (sx >= 240 && sx <= 319) || 
-                 (sx >= 400 && sx <= 479) || (sx >= 560)) ? 8'hFF : 8'h00;
-    end
-/////////////////////////////////////////////////////////////////////////////////
-// TMDS Encoder Instntiation
-////////////////////////////////////////////////////////////////////////////////
-    wire [9:0] tmds_red, tmds_green, tmds_blue;
-    
-    tmds_enc enc_r(
-        .clk    (clk_pix        ), 
-        .vd     (red            ), 
-        .cd     (2'b00          ), 
-        .de     (de             ), 
-        .tmds   (tmds_red       )
-    );
-    
-    tmds_enc enc_g(
-        .clk    (clk_pix        ), 
-        .vd     (green          ), 
-        .cd     (2'b00          ), 
-        .de     (de             ), 
-        .tmds   (tmds_green     )
-    );
-    
-    tmds_enc enc_b(
-        .clk    (clk_pix        ), 
-        .vd     (blue           ), 
-        .cd     ({vsync,hsync}  ), 
-        .de     (de             ), 
-        .tmds   (tmds_blue      )
-    );
+    reg [9:0] hcnt, vcnt;
 
-/////////////////////////////////////////////////////////////////////////////////
-// Serializer Instantiation
-////////////////////////////////////////////////////////////////////////////////
-    wire ser_red, ser_green, ser_blue;
-    
-    serializer ser_r(
-        .clk_pix    (clk_pix    ),
-        .clk_tmds   (clk_tmds   ),
-        .data_i     (tmds_red   ),
-        .data_o     (ser_red    )
-    );
-    
-    serializer ser_g(
-        .clk_pix    (clk_pix    ),
-        .clk_tmds   (clk_tmds   ),
-        .data_i     (tmds_green ),
-        .data_o     (ser_green  )
-    );
-    
-    serializer ser_b(
-        .clk_pix    (clk_pix    ),
-        .clk_tmds   (clk_tmds   ),
-        .data_i     (tmds_blue  ),
-        .data_o     (ser_blue   )
-    );
+    always @(posedge clk25 or posedge rst)
+        if (rst) hcnt<=0;
+        else if (hcnt==H_TOTAL-1) hcnt<=0;
+        else hcnt<=hcnt+1;
 
-/////////////////////////////////////////////////////////////////////////////////
-// Differential Output Buffers
-////////////////////////////////////////////////////////////////////////////////
-    OBUFDS #
-    (
-        .IOSTANDARD ("DEFAULT"  ),  // Specify the output I/O standard
-        .SLEW       ("SLOW"     )   // Specify the output slew rate
-    ) OBUFDS_red 
-    (
-        .O  (TMDSp[2]   ),          // Diff_p output (connect directly to top-level port)
-        .OB (TMDSn[2]   ),          // Diff_n output (connect directly to top-level port)
-        .I  (ser_red    )           // Buffer input
-    );
-    
-    OBUFDS #
-    (
-        .IOSTANDARD("DEFAULT"),
-        .SLEW("SLOW")
-    ) OBUFDS_green 
-    (
-        .O(TMDSp[1]),
-        .OB(TMDSn[1]),
-        .I(ser_green)
-    );
-    
-    OBUFDS #
-    (
-        .IOSTANDARD("DEFAULT"),
-        .SLEW("SLOW") 
-    ) OBUFDS_blue 
-    (
-        .O(TMDSp[0]), 
-        .OB(TMDSn[0]),
-        .I(ser_blue)
-    );
-    
-    OBUFDS #
-    (
-        .IOSTANDARD("DEFAULT"),
-        .SLEW("SLOW")
-    ) OBUFDS_clock 
-    (
-        .O(TMDSp_clock),
-        .OB(TMDSn_clock), 
-        .I(clk_pix)
-    );
+    always @(posedge clk25 or posedge rst)
+        if (rst) vcnt<=0;
+        else if (hcnt==H_TOTAL-1)
+            if (vcnt==V_TOTAL-1) vcnt<=0;
+            else vcnt<=vcnt+1;
 
+    assign hsync = ~((hcnt>=H_ACTIVE+H_FP) && (hcnt<H_ACTIVE+H_FP+H_SYNC));
+    assign vsync = ~((vcnt>=V_ACTIVE+V_FP) && (vcnt<V_ACTIVE+V_FP+V_SYNC));
+
+    assign video_on = (hcnt<H_ACTIVE)&&(vcnt<V_ACTIVE);
+    assign x = hcnt; assign y = vcnt;
 endmodule
